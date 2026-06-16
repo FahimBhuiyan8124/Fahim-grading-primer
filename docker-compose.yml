@@ -7,13 +7,15 @@ services:
       POSTGRES_DB: marksdb
     # Pre-seed script is required as a volume to load mock database
     # Data inside the container is lost on restart unless you persist it with a volume.
+    volumes:
+      - ./db/init.sql:/docker-entrypoint-initdb.d/init.sql
+      - db_data:var/lib/postgresql/data
     ports:
       - "5432:5432"
 
   backend:
     build: ./backend
     depends_on:
-      - backend
       - db
     environment:
       DB_HOST: db
@@ -26,7 +28,6 @@ services:
   frontend:
     build: ./frontend
     depends_on:
-      - frontend
       - db
     ports:
       - "8080:80"
@@ -38,3 +39,6 @@ services:
       - db
     profiles:
       - debug
+
+volumes:
+  db_data:
