@@ -18,7 +18,7 @@ def get_students():
     return: Array of student objects
     """
     student = db.get_all_students()
-    return jsonify([student]), 200
+    return jsonify(student), 200
 
 @app.route("/students", methods=["POST"])
 def create_student():
@@ -30,8 +30,25 @@ def create_student():
     return: The created student if successful
     """
     student_data = request.json
-    new_stud = db.insert_student(student_data["name"], student_data["course"], student_data["mark"])
-    return new_stud, 200
+    try:
+        student_mark = student_data["mark"]
+    except:
+        student_mark = 0
+
+    try:
+        student_course = student_data["course"]
+    except:
+        student_course = ""
+
+    try:
+        student_name = student_data["name"]
+    except:
+        student_name = ""
+
+
+
+    new_stud = db.insert_student(student_name, student_course, student_mark)
+    return jsonify(new_stud), 200
 
 @app.route("/students/<int:student_id>", methods=["PUT"])
 def update_student(student_id):
@@ -45,7 +62,7 @@ def update_student(student_id):
     student_data = request.json
     updated = db.update_student(student_id, student_data["name"], student_data["course"], student_data["mark"])
     if updated is None:
-        return 404
+        return jsonify("id not found"), 404
     return jsonify(updated), 200
 
 @app.route("/students/<int:student_id>", methods=["DELETE"])
@@ -56,7 +73,7 @@ def delete_student(student_id):
     """
     student = db.delete_student(student_id)
     if student is None:
-        return 404
+        return jsonify("id not found"), 404
     return jsonify(student), 200
 
 
@@ -72,10 +89,13 @@ def get_stats():
     for student in students:
         marks.append(student["mark"])
     count = len(marks)
-    average = sum(marks) / len(marks)
-    min = min(marks)
-    max = max(marks)
-    return jsonify({count, average, min, max}), 200
+    if count != 0:
+        average = sum(marks) / len(marks)
+    else:
+        average = 0
+    minimum = min(marks)
+    maxaximum = max(marks)
+    return jsonify({"count": count, "average": average, "min": minimum, "max": maxaximum}), 200
 
 @app.route("/")
 def health():
