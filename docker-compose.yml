@@ -16,15 +16,18 @@ services:
       - backend
       - db
     environment:
-      - DB_HOST = db
-      - DB_NAME = marksdb
-      - DB_USER = marksuser
-      - DB_PASSWORD = markspass
+      DB_HOST: db
+      DB_NAME:  marksdb
+      DB_USER: marksuser
+      DB_PASSWORD: markspass
     ports:
       - "5000:5000"
 
   frontend:
     build: ./frontend
+    depends_on:
+      - frontend
+      - db
     # TODO: you will need to add to this
     ports:
       - "8080:8080"
