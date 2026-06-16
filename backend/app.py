@@ -17,12 +17,8 @@ def get_students():
     Route to fetch all students from the database
     return: Array of student objects
     """
-    # TODO: replace with your implementation. This is a mock response
-    return jsonify([
-        {'course': 'COMP1531', 'id': 1, 'mark': 85, 'name': 'Alice Zhang'},
-        {'course': 'COMP1531', 'id': 2, 'mark': 72, 'name': 'Bob Smith'}
-    ]), 200
-
+    student = db.get_all_students()
+    return jsonify([student]), 200
 
 @app.route("/students", methods=["POST"])
 def create_student():
@@ -33,12 +29,9 @@ def create_student():
     param mark: The mark the student received (from request body)
     return: The created student if successful
     """
-
-    # Getting the request body - replace with your implementation
     student_data = request.json
-
-    pass
-
+    new_stud = db.insert_student(student_data["name"], student_data["course"], student_data["mark"])
+    return new_stud, 200
 
 @app.route("/students/<int:student_id>", methods=["PUT"])
 def update_student(student_id):
@@ -49,8 +42,11 @@ def update_student(student_id):
     param mark: The mark the student received (from request body)
     return: The updated student if successful
     """
-    pass  # replace with your implementation
-
+    student_data = request.json
+    updated = db.update_student(student_id, student_data["name"], student_data["course"], student_data["mark"])
+    if updated is None:
+        return 404
+    return jsonify(updated), 200
 
 @app.route("/students/<int:student_id>", methods=["DELETE"])
 def delete_student(student_id):
@@ -58,7 +54,11 @@ def delete_student(student_id):
     Route to delete student by id
     return: The deleted student
     """
-    pass  # replace with your implementation
+    student = db.delete_student(student_id)
+    if student is None:
+        return 404
+    return jsonify(student), 200
+
 
 
 @app.route("/stats")
@@ -67,8 +67,15 @@ def get_stats():
     Route to show the stats of all student marks 
     return: An object with the stats (count, average, min, max)
     """
-    pass  # replace with your implementation
-
+    students = db.get_all_students()
+    marks = []
+    for student in students:
+        marks.append(student["mark"])
+    count = len(marks)
+    average = sum(marks) / len(marks)
+    min = min(marks)
+    max = max(marks)
+    return jsonify({count, average, min, max}), 200
 
 @app.route("/")
 def health():
