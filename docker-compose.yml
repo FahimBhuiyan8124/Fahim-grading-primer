@@ -28,9 +28,8 @@ services:
     depends_on:
       - frontend
       - db
-    # TODO: you will need to add to this
     ports:
-      - "8080:8080"
+      - "8080:80"
 
   automark:
     build: ./automark
