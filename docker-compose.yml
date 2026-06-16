@@ -11,10 +11,23 @@ services:
       - "5432:5432"
 
   backend:
-    # TODO: you will need to add to this
+    build: ./backend
+    depends_on:
+      - backend
+      - db
+    environment:
+      - DB_HOST = db
+      - DB_NAME = marksdb
+      - DB_USER = marksuser
+      - DB_PASSWORD = markspass
+    ports:
+      - "5000:5000"
 
   frontend:
+    build: ./frontend
     # TODO: you will need to add to this
+    ports:
+      - "8080:8080"
 
   automark:
     build: ./automark
